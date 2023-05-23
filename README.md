@@ -73,3 +73,13 @@ Project License can be found [here](LICENSE).
 
 
 ## Reference
+
+- [a-rustic-invitation-to-parsing](https://www.equalto.com/blog/a-rustic-invitation-to-parsing)
+- [abstract-syntax-tree-an-example-in-c](https://keleshev.com/abstract-syntax-tree-an-example-in-c/)
+- [ast-grep](https://ast-grep.github.io/)
+- [groovy-language-server](https://github.com/GroovyLanguageServer/groovy-language-server)
+- [groovy-parser](https://github.com/daniellansun/groovy-parser)
+- [groovy-sample](http://groovy-lang.org/releasenotes/groovy-3.0.html)
+- [introduction-to-abstract-syntax-trees-in-go](https://tech.ingrid.com/introduction-ast-golang/)
+- [lets-build-a-simple-interpreter](https://ruslanspivak.com/lsbasi-part7/)
+- [tree-sitter](https://tree-sitter.github.io/tree-sitter/)
