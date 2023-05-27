@@ -16,11 +16,12 @@ import (
 	"github.com/pipebuild/parser/config"
 	"github.com/pipebuild/parser/lexer"
 	"github.com/pipebuild/parser/parser"
+	"github.com/pipebuild/parser/tokenizer"
 )
 
 var (
 	app        = kingpin.New("parser", "pipebuild parser").Version(config.Version + "-build-" + config.Build)
-	configFile = app.Flag("config-file", "Config file (.yml)").Required().String()
+	configFile = app.Flag("config-file", "Config file (.yml)").String()
 	inputPath  = app.Flag("input-path", "Input path").Required().String()
 	outputFile = app.Flag("output-file", "Output file (.json)").Required().String()
 )
@@ -28,10 +29,7 @@ var (
 func Run(ctx context.Context) error {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	c, err := initConfig(ctx, *configFile)
-	if err != nil {
-		return errors.Wrap(err, "failed to init config")
-	}
+	c, _ := initConfig(ctx, *configFile)
 
 	a, err := initAst(ctx, c)
 	if err != nil {
@@ -43,12 +41,17 @@ func Run(ctx context.Context) error {
 		return errors.Wrap(err, "failed to init lexer")
 	}
 
+	t, err := initTokenizer(ctx, c)
+	if err != nil {
+		return errors.Wrap(err, "failed to init tokenizer")
+	}
+
 	p, err := initParser(ctx, c)
 	if err != nil {
 		return errors.Wrap(err, "failed to init parser")
 	}
 
-	if err := runParser(ctx, a, l, p); err != nil {
+	if err := runParser(ctx, a, l, t, p); err != nil {
 		return errors.Wrap(err, "failed to run parser")
 	}
 
@@ -94,6 +97,15 @@ func initLexer(ctx context.Context, _ *config.Config) (lexer.Lexer, error) {
 	return lexer.New(ctx, c), nil
 }
 
+func initTokenizer(ctx context.Context, _ *config.Config) (tokenizer.Tokenizer, error) {
+	c := tokenizer.DefaultConfig()
+	if c == nil {
+		return nil, errors.New("failed to config")
+	}
+
+	return tokenizer.New(ctx, c), nil
+}
+
 func initParser(ctx context.Context, _ *config.Config) (parser.Parser, error) {
 	c := parser.DefaultConfig()
 	if c == nil {
@@ -103,7 +115,7 @@ func initParser(ctx context.Context, _ *config.Config) (parser.Parser, error) {
 	return parser.New(ctx, c), nil
 }
 
-func runParser(ctx context.Context, a ast.Ast, l lexer.Lexer, p parser.Parser) error {
+func runParser(ctx context.Context, _ ast.Ast, _ lexer.Lexer, _ tokenizer.Tokenizer, p parser.Parser) error {
 	if err := p.Init(ctx); err != nil {
 		return errors.New("failed to init")
 	}

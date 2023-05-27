@@ -24,7 +24,9 @@
 
 ```bash
 version=latest make build
-./bin/parser --config-file="$PWD"/test/config/config.yml --input-path=/path/to/input-path --output-file=/path/to/output-file
+./bin/parser \
+  --input-path=/path/to/input-path \
+  --output-file=/path/to/output-file
 ```
 
 
@@ -33,7 +35,9 @@ version=latest make build
 
 ```bash
 version=latest make docker
-docker run -v "$PWD"/test:/tmp ghcr.io/pipebuild/parser:latest --config-file=/tmp/config/config.yml --input-path=/path/to/input-path --output-file=/path/to/output-file
+docker run -v "$PWD"/test:/tmp ghcr.io/pipebuild/parser:latest \
+  --input-path=/path/to/input-path \
+  --output-file=/path/to/output-file
 ```
 
 
@@ -41,7 +45,7 @@ docker run -v "$PWD"/test:/tmp ghcr.io/pipebuild/parser:latest --config-file=/tm
 ## Usage
 
 ```
-usage: parser --config-file=CONFIG-FILE --input-path=INPUT-PATH --output-file=OUTPUT-FILE [<flags>]
+usage: parser --input-path=INPUT-PATH --output-file=OUTPUT-FILE [<flags>]
 
 pipebuild parser
 
@@ -64,13 +68,7 @@ Flags:
 An example of configuration in [config.yml](https://github.com/pipebuild/parser/blob/main/config/config.yml):
 
 ```yaml
-apiVersion: v1
-kind: parser
-metadata:
-  name: parser
-spec:
-  lang:
-    - groovy
+TBD
 ```
 
 

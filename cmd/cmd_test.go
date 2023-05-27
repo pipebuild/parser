@@ -40,6 +40,16 @@ func TestInitLexer(t *testing.T) {
 	assert.Equal(t, nil, err)
 }
 
+func TestInitTokenizer(t *testing.T) {
+	ctx := context.Background()
+
+	c, err := initConfig(ctx, "../test/config/config.yml")
+	assert.Equal(t, nil, err)
+
+	_, err = initTokenizer(ctx, c)
+	assert.Equal(t, nil, err)
+}
+
 func TestInitParser(t *testing.T) {
 	ctx := context.Background()
 
