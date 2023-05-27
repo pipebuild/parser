@@ -3,13 +3,19 @@ package cmd
 import (
 	"context"
 	"io"
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
+	"github.com/pipebuild/parser/ast"
 	"github.com/pipebuild/parser/config"
+	"github.com/pipebuild/parser/lexer"
+	"github.com/pipebuild/parser/parser"
 )
 
 var (
@@ -22,9 +28,28 @@ var (
 func Run(ctx context.Context) error {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	_, err := initConfig(ctx, *configFile)
+	c, err := initConfig(ctx, *configFile)
 	if err != nil {
 		return errors.Wrap(err, "failed to init config")
+	}
+
+	a, err := initAst(ctx, c)
+	if err != nil {
+		return errors.Wrap(err, "failed to init ast")
+	}
+
+	l, err := initLexer(ctx, c)
+	if err != nil {
+		return errors.Wrap(err, "failed to init lexer")
+	}
+
+	p, err := initParser(ctx, c)
+	if err != nil {
+		return errors.Wrap(err, "failed to init parser")
+	}
+
+	if err := runParser(ctx, a, l, p); err != nil {
+		return errors.Wrap(err, "failed to run parser")
 	}
 
 	return nil
@@ -49,4 +74,62 @@ func initConfig(_ context.Context, name string) (*config.Config, error) {
 	}
 
 	return c, nil
+}
+
+func initAst(ctx context.Context, _ *config.Config) (ast.Ast, error) {
+	c := ast.DefaultConfig()
+	if c == nil {
+		return nil, errors.New("failed to config")
+	}
+
+	return ast.New(ctx, c), nil
+}
+
+func initLexer(ctx context.Context, _ *config.Config) (lexer.Lexer, error) {
+	c := lexer.DefaultConfig()
+	if c == nil {
+		return nil, errors.New("failed to config")
+	}
+
+	return lexer.New(ctx, c), nil
+}
+
+func initParser(ctx context.Context, _ *config.Config) (parser.Parser, error) {
+	c := parser.DefaultConfig()
+	if c == nil {
+		return nil, errors.New("failed to config")
+	}
+
+	return parser.New(ctx, c), nil
+}
+
+func runParser(ctx context.Context, a ast.Ast, l lexer.Lexer, p parser.Parser) error {
+	if err := p.Init(ctx); err != nil {
+		return errors.New("failed to init")
+	}
+
+	go func(ctx context.Context, p parser.Parser) {
+		if err := p.Run(ctx); err != nil {
+			log.Fatalf("failed to run: %v", err)
+		}
+	}(ctx, p)
+
+	s := make(chan os.Signal, 1)
+
+	// kill (no param) default send syscanll.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can"t be caught, so don't need add it
+	signal.Notify(s, syscall.SIGINT, syscall.SIGTERM)
+
+	done := make(chan bool, 1)
+
+	go func(ctx context.Context, p parser.Parser, s chan os.Signal, done chan bool) {
+		<-s
+		_ = p.Deinit(ctx)
+		done <- true
+	}(ctx, p, s, done)
+
+	<-done
+
+	return nil
 }
