@@ -3,3 +3,5 @@ kind: parser
 metadata:
   name: parser
 spec:
+  lang:
+    - groovy

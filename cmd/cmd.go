@@ -15,6 +15,8 @@ import (
 var (
 	app        = kingpin.New("parser", "pipebuild parser").Version(config.Version + "-build-" + config.Build)
 	configFile = app.Flag("config-file", "Config file (.yml)").Required().String()
+	inputPath  = app.Flag("input-path", "Input path").Required().String()
+	outputFile = app.Flag("output-file", "Output file (.json)").Required().String()
 )
 
 func Run(ctx context.Context) error {

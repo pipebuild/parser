@@ -12,6 +12,7 @@ type MetaData struct {
 }
 
 type Spec struct {
+	Lang []string `yaml:"lang"`
 }
 
 var (

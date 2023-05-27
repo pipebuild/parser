@@ -24,7 +24,7 @@
 
 ```bash
 version=latest make build
-./bin/parser --config-file="$PWD"/test/config/config.yml
+./bin/parser --config-file="$PWD"/test/config/config.yml --input-path=/path/to/input-path --output-file=/path/to/output-file
 ```
 
 
@@ -33,7 +33,7 @@ version=latest make build
 
 ```bash
 version=latest make docker
-docker run -v "$PWD"/test:/tmp ghcr.io/pipebuild/parser:latest --config-file=/tmp/config/config.yml
+docker run -v "$PWD"/test:/tmp ghcr.io/pipebuild/parser:latest --config-file=/tmp/config/config.yml --input-path=/path/to/input-path --output-file=/path/to/output-file
 ```
 
 
@@ -41,15 +41,18 @@ docker run -v "$PWD"/test:/tmp ghcr.io/pipebuild/parser:latest --config-file=/tm
 ## Usage
 
 ```
-usage: parser --config-file=CONFIG-FILE [<flags>]
+usage: parser --config-file=CONFIG-FILE --input-path=INPUT-PATH --output-file=OUTPUT-FILE [<flags>]
 
 pipebuild parser
+
 
 Flags:
   --[no-]help                Show context-sensitive help (also try --help-long
                              and --help-man).
   --[no-]version             Show application version.
   --config-file=CONFIG-FILE  Config file (.yml)
+  --input-path=INPUT-PATH    Input path
+  --output-file=OUTPUT-FILE  Output file (.json)
 ```
 
 
@@ -61,7 +64,13 @@ Flags:
 An example of configuration in [config.yml](https://github.com/pipebuild/parser/blob/main/config/config.yml):
 
 ```yaml
-TBD
+apiVersion: v1
+kind: parser
+metadata:
+  name: parser
+spec:
+  lang:
+    - groovy
 ```
 
 
@@ -77,6 +86,7 @@ Project License can be found [here](LICENSE).
 - [a-rustic-invitation-to-parsing](https://www.equalto.com/blog/a-rustic-invitation-to-parsing)
 - [abstract-syntax-tree-an-example-in-c](https://keleshev.com/abstract-syntax-tree-an-example-in-c/)
 - [ast-grep](https://ast-grep.github.io/)
+- [groovy-lang-doc](https://groovy-lang.org/documentation.html)
 - [groovy-language-server](https://github.com/GroovyLanguageServer/groovy-language-server)
 - [groovy-parser](https://github.com/daniellansun/groovy-parser)
 - [groovy-sample](http://groovy-lang.org/releasenotes/groovy-3.0.html)
